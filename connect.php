@@ -1,4 +1,11 @@
 <?php
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+require 'PHPMailer/src/Exception.php';
+require 'PHPMailer/src/PHPMailer.php';
+require 'PHPMailer/src/SMTP.php';
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Get form data
     $firstname = $_POST["firstname"];
@@ -35,12 +42,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             VALUES ('$firstname', '$lastname', '$email', '$password')";
 
     if ($conn->query($sql) === TRUE) {
-        echo "Registration successful";
+        echo "Registration successful!";
     } else {
         echo "Registration unsuccessful: " . $conn->error;
     }
     
 
+    $mail = new PHPmailer(true);
+
+    $mail->isSMTP();
+    $mail->Host = 'smtp.gmail.com';
+    $mail->SMTPAuth = true;
+    $mail->Username= 'ricardoharrison15@gmail.com';
+    $mail->Password = 'ugttboxbopgsjfig '; //email app password
+    $mail->SMTPSecure = 'ssl';
+    $mail->Port =465;
+
+    $mail->setFrom('ricardoharrison15@gmail.com');
+    $mail->addAddress($_POST["email"]);
+    $mail->isHTML(true);
+
+    $mail-> Subject = "Hello! ".$_POST["firstname"]." ".$_POST["lastname"];
+    $mail->Body = "<span style='font-family: Arial; font-weight: bold;'> Thank you for Registering! </span> <br><br>  As of now you're apart of the LDAC family. We hope to make your stay worth while.  <br><br> Warm regards, <br> Linstead Development Committee";
+
+    $mail->send();
+
+    echo "\n\nAn email has been sent to you.";
+
+    
     $conn->close();
 }
 ?>
